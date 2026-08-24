@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.Eventing.Reader;
+using System.Security.Cryptography.X509Certificates;
+using WebAPIDemo.Filters;
 using WebAPIDemo.Models;
 using WebAPIDemo.Models.Repositories;
 
@@ -13,25 +15,34 @@ namespace WebAPIDemo.Controllers
         [HttpGet]
         public IActionResult GetShirts()
         {
-            return Ok("Reading all the Shirts");
+            return Ok(ShirtRepository.GetShirts());
         }
 
         [HttpGet("{id}")]
+        [Shirt_ValidateShirtIdFilter]
         public IActionResult GetShirtById(int id)
         {
-            if (id <= 0) return BadRequest();
+            //if (id <= 0) return BadRequest();
 
-            Shirt? shirt = ShirtRepository.GetShirtById(id);
+            //Shirt? shirt = ShirtRepository.GetShirtById(id);
 
-            if (shirt == null) return NotFound();
+            //if (shirt == null) return NotFound();
             
-            return Ok(shirt);
+            return Ok(ShirtRepository.GetShirtById(id));
         }
 
         [HttpPost]
         public IActionResult CreateShirt([FromBody]Shirt shirt)
         {
-            return Ok("Creating a shirt");
+            if (shirt == null) return BadRequest();
+
+            var existingshirt = ShirtRepository.GetShirtByProperties(shirt.Brand, shirt.Gender, shirt.Color, shirt.Size);
+            if(existingshirt!=null)return BadRequest();
+
+            ShirtRepository.AddShirt(shirt);
+
+            return CreatedAtAction(nameof(GetShirtById), new { id = shirt.ShirtId },
+                                    shirt);
         }
 
         [HttpPut("{id}")]

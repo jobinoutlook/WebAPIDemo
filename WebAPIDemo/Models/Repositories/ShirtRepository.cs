@@ -39,11 +39,10 @@
                 !string.IsNullOrWhiteSpace(color) &&
                 !string.IsNullOrWhiteSpace(x.Color) &&
                 x.Color.Equals(color, StringComparison.OrdinalIgnoreCase) &&
-
+               
                 size.HasValue &&
                 x.Size.HasValue &&
-                size.Value == x.Size.Value
-                );
+                size.Value == x.Size.Value);
 
         }
 
