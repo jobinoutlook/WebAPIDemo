@@ -32,9 +32,10 @@ namespace WebAPIDemo.Controllers
         }
 
         [HttpPost]
+        [Shirt_ValidateShirtCreateFilter]
         public IActionResult CreateShirt([FromBody]Shirt shirt)
         {
-            if (shirt == null) return BadRequest();
+            //if (shirt == null) return BadRequest();
 
             var existingshirt = ShirtRepository.GetShirtByProperties(shirt.Brand, shirt.Gender, shirt.Color, shirt.Size);
             if(existingshirt!=null)return BadRequest();
