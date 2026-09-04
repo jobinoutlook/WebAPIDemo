@@ -39,10 +39,8 @@ namespace WebAPIDemo.Controllers
         {
             //if (shirt == null) return BadRequest();
 
-            var existingshirt = ShirtRepository.GetShirtByProperties(shirt.Brand, shirt.Gender, shirt.Color, shirt.Size);
-            if(existingshirt!=null)return BadRequest();
-
-            ShirtRepository.AddShirt(shirt);
+            db.Shirts.Add(shirt);
+            db.SaveChanges();
 
             return CreatedAtAction(nameof(GetShirtById), new { id = shirt.ShirtId },
                                     shirt);
@@ -51,17 +49,31 @@ namespace WebAPIDemo.Controllers
         [HttpPut("{id}")]
         [TypeFilter(typeof(Shirt_ValidateShirtIdFilterAttribute))]
         [Shirt_ValidateUpdateShirtFilter]
-        [Shirt_HandleUpdateExceptionsFilter]
+        [TypeFilter(typeof(Shirt_HandleUpdateExceptionsFilterAttribute))]
         public IActionResult UpdateShirt(int id,Shirt shirt)
         {
-            return Ok($"Updating shirt: {id}");
+            var shirt_update = HttpContext.Items["shirt"] as Shirt;
+            shirt_update?.Brand = shirt.Brand;
+            shirt_update?.Price = shirt.Price;
+            shirt_update?.Size = shirt.Size;
+            shirt_update?.Color = shirt.Color;
+            shirt_update?.Gender = shirt.Gender;
+
+            db.SaveChanges();
+
+            return NoContent();
+
         }
 
         [HttpDelete("{id}")]
         [TypeFilter(typeof(Shirt_ValidateShirtIdFilterAttribute))]
         public IActionResult DeleteShirt(int id)
         {
-            return Ok($"Deleting shirt: {id}");
+            var shirt = HttpContext.Items["shirt"] as Shirt;
+            db.Shirts.Remove(shirt);
+            db.SaveChanges();
+
+            return Ok(shirt);
         }
     }
 }
