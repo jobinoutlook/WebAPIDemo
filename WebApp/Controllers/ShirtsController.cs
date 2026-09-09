@@ -17,6 +17,7 @@ namespace WebApp.Controllers
             return View(await webApiExecuter.InvokeGet<List<Shirt>>("shirts"));
         }
 
+        [HttpGet]
         public IActionResult CreateShirt()
         {
             return View();
@@ -25,7 +26,39 @@ namespace WebApp.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateShirt(Shirt shirt)
         {
-            return View();
+            if(ModelState.IsValid)
+            {
+                var response = await webApiExecuter.InvokePost("shirts", shirt);
+                if (response != null)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            return View(shirt);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateShirt(int shirtId)
+        {
+            var shirt = await webApiExecuter.InvokeGet<Shirt>($"shirts/{shirtId}");
+            if (shirt != null)
+            {
+                return View(shirt);
+            }
+
+            return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateShirt(Shirt shirt)
+        {
+            if (ModelState.IsValid)
+            {
+                await webApiExecuter.InvokePut($"shirts/{shirt.ShirtId}", shirt);
+                return RedirectToAction(nameof(Index));
+                
+            }
+            return View(shirt);
         }
     }
 }
