@@ -60,5 +60,12 @@ namespace WebApp.Controllers
             }
             return View(shirt);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteShirt([FromForm]int  shirtId)
+        {
+            await webApiExecuter.InvokeDelete($"shirts/{shirtId}");
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
