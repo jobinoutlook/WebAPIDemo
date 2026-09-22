@@ -22,7 +22,7 @@ namespace WebAPIDemo.Controllers
         {
             if (Authenticator.Authenticate(credential.ClientId, credential.Secret))
             {
-                var expiresAt = DateTime.UtcNow.AddMinutes(60);
+                var expiresAt = DateTime.UtcNow.AddMinutes(10);
                 var secretKey = _configuration["SecurityKey"] ?? string.Empty;
                 return Ok(new
                 {
