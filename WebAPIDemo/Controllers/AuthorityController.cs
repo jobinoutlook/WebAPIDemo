@@ -20,13 +20,13 @@ namespace WebAPIDemo.Controllers
         [HttpPost("auth")]
         public IActionResult Authenticate([FromBody] AppCredential credential)
         {
-            if (AppRepository.Authenticate(credential.ClientId, credential.Secret))
+            if (Authenticator.Authenticate(credential.ClientId, credential.Secret))
             {
-                var expiresAt = DateTime.UtcNow.AddMinutes(10);
-
+                var expiresAt = DateTime.UtcNow.AddMinutes(60);
+                var secretKey = _configuration["SecurityKey"] ?? string.Empty;
                 return Ok(new
                 {
-                    access_token = CreateToken(credential.ClientId,expiresAt),
+                    access_token = Authenticator.CreateToken(credential.ClientId,expiresAt, secretKey),
                     expires_at = expiresAt,
 
                 });
@@ -43,36 +43,7 @@ namespace WebAPIDemo.Controllers
             }
         }
 
-        private string CreateToken(string clientId,DateTime expiresAt)
-        {
-            var securityKey = _configuration["SecurityKey"]??string.Empty;
-            
-            var signingCredentials = new SigningCredentials(
-                   new SymmetricSecurityKey(System.Text.Encoding.UTF32.GetBytes(securityKey)),
-                   SecurityAlgorithms.HmacSha256Signature
-                   );
-
-            var app = AppRepository.GetApplicationByClientId(clientId);
-            var claimsDictionary = new Dictionary<string, object>()
-            {
-                {"AppName",app?.ApplicationName??string.Empty },
-                {"Read",(app?.Scopes??string.Empty).Contains("read")?"true":"false" },
-                {"Write",(app?.Scopes??string.Empty).Contains("write")?"true":"false" },
-
-            };
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-               SigningCredentials = signingCredentials,
-               Claims = claimsDictionary,
-               Expires= expiresAt,
-               NotBefore = DateTime.UtcNow,     
-
-            };
-
-            var tokenHandler = new JsonWebTokenHandler();
-            return tokenHandler.CreateToken(tokenDescriptor);
-        }
+        
 
     }
 }

@@ -4,6 +4,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.Security.Cryptography.X509Certificates;
 using WebAPIDemo.Data;
 using WebAPIDemo.Filters;
+using WebAPIDemo.Filters.AuthFilters;
 using WebAPIDemo.Models;
 using WebAPIDemo.Models.Repositories;
 
@@ -11,6 +12,7 @@ namespace WebAPIDemo.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [JwtAuthFilter]
     public class ShirtsController: ControllerBase
     {
         ApplicationDbContext db;
