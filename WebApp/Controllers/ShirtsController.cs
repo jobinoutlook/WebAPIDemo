@@ -112,7 +112,7 @@ namespace WebApp.Controllers
             }
             else if(ex.ErrorResponse !=null)
             {
-                ModelState.AddModelError("Error", ex.ErrorResponse.Title);
+                ModelState.AddModelError("Error", ex.ErrorResponse.Title??string.Empty);
             }
             else
             {

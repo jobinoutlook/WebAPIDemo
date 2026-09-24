@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace WebAPIDemo.Authority
@@ -28,10 +29,19 @@ namespace WebAPIDemo.Authority
             var claimsDictionary = new Dictionary<string, object>()
             {
                 {"AppName",app?.ApplicationName??string.Empty },
-                {"Read",(app?.Scopes??string.Empty).Contains("read")?"true":"false" },
-                {"Write",(app?.Scopes??string.Empty).Contains("write")?"true":"false" },
+                //{"Read",(app?.Scopes??string.Empty).Contains("read")?"true":"false" },
+                //{"Write",(app?.Scopes??string.Empty).Contains("write")?"true":"false" },
 
             };
+
+            var scopes = app?.Scopes?.Split(',') ?? Array.Empty<string>();
+            if(scopes.Length>0)
+            {
+                foreach (var scope in scopes)
+                {
+                    claimsDictionary.Add(scope, "true");
+                }
+            }
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -46,11 +56,11 @@ namespace WebAPIDemo.Authority
             return tokenHandler.CreateToken(tokenDescriptor);
         }
 
-        public static async Task<bool> VerifyTokenAsync(string tokenString, string securityKey)
+        public static async Task<IEnumerable<Claim>?> VerifyTokenAsync(string tokenString, string securityKey)
         {
             if(string.IsNullOrWhiteSpace(tokenString) || string.IsNullOrWhiteSpace(securityKey))
             {
-                return false;
+                return null;
             };
 
             var keyBytes = System.Text.Encoding.UTF32.GetBytes(securityKey);
@@ -70,19 +80,29 @@ namespace WebAPIDemo.Authority
             {
                 var result = await tokenHandler.ValidateTokenAsync(tokenString, validationParameters);
 
-                return result.IsValid;
+                if (result.SecurityToken != null)
+                {
+                    var tokenObject = tokenHandler.ReadJsonWebToken(tokenString);
+                    return tokenObject.Claims ?? Enumerable.Empty<Claim>();
+                }
+                else
+                {
+                    return null;
+                }
+                
+                
             }
             catch (SecurityTokenMalformedException)
             {
-                return false;
+                return null;
             }
             catch (SecurityTokenExpiredException)
             {
-                return false;
+                return null;       
             }
             catch (SecurityTokenInvalidSignatureException)
             {
-                return false;
+                return null;
             }
             catch (Exception)
             {
