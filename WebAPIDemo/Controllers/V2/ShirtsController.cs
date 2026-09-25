@@ -5,11 +5,12 @@ using System.Security.Cryptography.X509Certificates;
 using WebAPIDemo.Attributes;
 using WebAPIDemo.Data;
 using WebAPIDemo.Filters;
+using WebAPIDemo.Filters.ActionFilters.V2;
 using WebAPIDemo.Filters.AuthFilters;
 using WebAPIDemo.Models;
 using WebAPIDemo.Models.Repositories;
 
-namespace WebAPIDemo.Controllers
+namespace WebAPIDemo.Controllers.V2
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -40,6 +41,7 @@ namespace WebAPIDemo.Controllers
 
         [HttpPost]
         [TypeFilter(typeof(Shirt_ValidateShirtCreateFilterAttribute))]
+        [Shirt_EnsureDescriptionIsPresentFilter]
         [RequiredClaim("write", "true")]    
         public IActionResult CreateShirt([FromBody]Shirt shirt)
         {
@@ -56,6 +58,7 @@ namespace WebAPIDemo.Controllers
         [TypeFilter(typeof(Shirt_ValidateShirtIdFilterAttribute))]
         [Shirt_ValidateUpdateShirtFilter]
         [TypeFilter(typeof(Shirt_HandleUpdateExceptionsFilterAttribute))]
+        [Shirt_EnsureDescriptionIsPresentFilter]
         [RequiredClaim("write", "true")]
         public IActionResult UpdateShirt(int id,Shirt shirt)
         {
