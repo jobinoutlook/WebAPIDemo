@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebAPIDemo.Controllers
 {
     [ApiController]
+    [ApiVersion("1.0")]
+    [ApiExplorerSettings(GroupName = "v1")]
     [Route("api/[controller]")]
     public class PantsController : ControllerBase
     {

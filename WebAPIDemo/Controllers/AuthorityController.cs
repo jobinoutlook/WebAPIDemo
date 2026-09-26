@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -9,6 +10,10 @@ using WebAPIDemo.Authority;
 namespace WebAPIDemo.Controllers
 {
     [ApiController]
+    [Route("api/[controller]")]
+    [ApiVersionNeutral]
+    //[ApiExplorerSettings(GroupName = "v1")]
+
     public class AuthorityController : ControllerBase
     {
         IConfiguration _configuration;

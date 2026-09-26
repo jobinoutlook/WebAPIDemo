@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.OAuth;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.Eventing.Reader;
 using System.Security.Cryptography.X509Certificates;
@@ -12,6 +13,8 @@ using WebAPIDemo.Models.Repositories;
 namespace WebAPIDemo.Controllers
 {
     [ApiController]
+    [ApiVersion("1.0")]
+    [ApiExplorerSettings(GroupName = "v1")]
     [Route("api/[controller]")]
     [JwtAuthFilter]
     public class ShirtsController: ControllerBase
